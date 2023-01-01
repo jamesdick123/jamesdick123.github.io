@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>League of Legends Match History</title>
+    <title>League of Legends Match History UPDATED</title>
   </head>
   <body>
     <h1>League of Legends Match History</h1>
@@ -17,13 +17,19 @@
         const username = document.getElementById('username').value;
         
         // Fetch the match history from the Riot Games API
-        fetch(`https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}`, {
-          headers: {
-            'X-Riot-Token': 'RGAPI-ddb895b7-bba7-4689-92c0-9d255dd04756'
+        fetch(`https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}`, 
+        {
+        headers: {
+        'X-Riot-Token': 'RGAPI-ddb895b7-bba7-4689-92c0-9d255dd04756'
           }
         })
+
+            
         .then(response => response.json())
         .then(data => {
+        window.accountId = data.accountId;
+        
+
           // Display the match history on the page
           let matchHistory = '';
           data.matches.forEach(match => {
