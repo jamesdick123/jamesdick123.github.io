@@ -1,81 +1,40 @@
 <html>
-<head>
-  <title>Summoner Match History</title>
-</head>
-<body>
-  <h1>Summoner Match History</h1>
+  <head>
+    <title>League of Legends Match History</title>
+  </head>
+  <body>
+    <h1>League of Legends Match History</h1>
+    <form>
+      <label for="username">Enter your League of Legends username:</label><br>
+      <input type="text" id="username" name="username"><br>
+      <button type="button" onclick="fetchMatchHistory()">Fetch match history</button>
+    </form>
+    <div id="match-history"></div>
 
-  <!-- Add a search form -->
-  <form id="search-form">
-    <label for="summoner-name">Summoner Name:</label>
-    <input type="text" id="summoner-name" name="summoner-name">
-    <button type="submit">Search</button>
-  </form>
-
-  <!-- Add a container for the match history -->
-  <div id="match-history"></div>
-
-  <script>
-    // Replace with your Riot Games API key
-    const apiKey = "RGAPI-ddb895b7-bba7-4689-92c0-9d255dd04756";
-
-    // Set the region
-    const region = "euw1";
-
-    // Get a reference to the search form and summoner name input
-    const form = document.getElementById('search-form');
-    const input = document.getElementById('summoner-name');
-
-    // Add an event listener to the form to look up the summoner when it is submitted
-    form.addEventListener('submit', event => {
-      // Prevent the form from reloading the page
-      event.preventDefault();
-
-      // Clear the existing match history
-      const historyElement = document.getElementById('match-history');
-      historyElement.innerHTML = '';
-
-      // Get the summoner name from the input
-      const summonerName = input.value;
-
-      // Make the API request to look up the summoner using jsonp
-      const script = document.createElement('script');
-      script.src = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}&callback=displaySummoner`;
-      document.body.appendChild(script);
-    });
-
-    // Define the callback function to handle the summoner data
-    window.displaySummoner = summoner => {
-      // Extract the summoner's ID from the response
-      const summonerId = summoner['id'];
-
-      // Make the API request to get the summoner's match history using jsonp
-      const script = document.createElement('script');
-      script.src = `https://${region}.api.riotgames.com/lol/match/v4/matchlists/by-account/${summonerId}?api_key=${apiKey}&callback=displayMatchHistory`;
-      document.body.appendChild(script);
-    }
-
-    // Define the callback function to handle the match history data
-    window.displayMatchHistory = matchData => {
-      // Extract the list of matches from the response
-      const matches = matchData['matches'];
-
-      // Create a list element to hold the match history
-      const list = document.createElement('ul');
-
-        // Add each match to the list
-      matches.forEach(match => {
-        const item = document.createElement('li');
-        item.textContent = `Match ID: ${match['gameId']} | Mode: ${match['gameMode']} | Champion: ${match['champion']}`;
-        list.appendChild(item);
-      });
-
-      // Add the list to the page
-      const historyElement = document.getElementById('match-history');
-      historyElement.appendChild(list);
-    }
-  </script>
-</body>
+    <script>
+      function fetchMatchHistory() {
+        // Get the user's inputted username
+        const username = document.getElementById('username').value;
+        
+        // Fetch the match history from the Riot Games API
+        fetch(`https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/${accountId}`, {
+          headers: {
+            'X-Riot-Token': 'RGAPI-ddb895b7-bba7-4689-92c0-9d255dd04756'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Display the match history on the page
+          let matchHistory = '';
+          data.matches.forEach(match => {
+            matchHistory += `<div>${match.gameId}: ${match.champion}</div>`;
+          });
+          document.getElementById('match-history').innerHTML = matchHistory;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      }
+    </script>
+  </body>
 </html>
-
-
