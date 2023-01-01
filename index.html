@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>LoL Match History</title>
@@ -25,14 +26,12 @@
       const API_URL = 'https://euw1.api.riotgames.com';
 
       async function getMatchHistory() {
-        console.log('called');
         const username = document.getElementById('username').value;
         const response = await fetch(`${API_URL}/lol/summoner/v4/summoners/by-name/${username}?api_key=${API_KEY}`);
         const summoner = await response.json();
         const summonerId = summoner.id;
         const matchHistoryResponse = await fetch(`${API_URL}/lol/match/v4/matchlists/by-account/${summonerId}?api_key=${API_KEY}`);
         const matchHistory = await matchHistoryResponse.json();
-        console.log('reached');
         console.log(matchHistory);
         // Display the match history data in a table
         const table = document.getElementById('matchHistoryTable');
