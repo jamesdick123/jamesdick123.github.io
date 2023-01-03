@@ -1,68 +1,32 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <title>LoL Match History</title>
+    <title>Summoner Lookup</title>
   </head>
   <body>
-    <h1>LoL Match History</h1>
-    <p>Enter your LoL username:</p>
-    <form id="form">
-      <input type="text" id="username" name="username">
-      <button onclick="getMatchHistory()">Submit</button>
-    </form>
-    <br>
-    <div id="matchHistoryContainer">
-      <table id="matchHistoryTable">
-        <tr>
-          <th>Game ID</th>
-          <th>Champion</th>
-          <th>Queue</th>
-          <th>Timestamp</th>
-        </tr>
-      </table>
-    </div>
+    <h1>Summoner Lookup</h1>
+    <p>Enter a summoner name:</p>
+    <input type="text" id="summonerName">
+    <button onclick="lookupSummoner()">Lookup</button>
+    <br><br>
+    <p>Result:</p>
+    <pre id="result"></pre>
+    
     <script>
-      cors: {
-      origin: ['https://jamesdick123.github.io', 'http://localhost:5000'],
-      methods: 'GET,HEAD,PUT,PATCH,DELETE',
-      },cors: {
-      origin: ['https://jamesdick123.github.io', 'http://localhost:5000'],
-      methods: 'GET,HEAD,PUT,PATCH,DELETE',
-      },
-  
-      const API_KEY = 'RGAPI-ddb895b7-bba7-4689-92c0-9d255dd04756';
-      const API_URL = 'https://euw1.api.riotgames.com';
-
-      async function getMatchHistory() {
-        console.log('CALLED');
-        const username = document.getElementById('username').value;
-        const response = await fetch(`${API_URL}/lol/summoner/v4/summoners/by-name/${username}&api_key=${API_KEY}`);
-        const summoner = await response.json();
-        const summonerId = summoner.puuid;
-        console.log('made it');
-        console.log(summonerId);
-        const matchHistoryResponse = await fetch(`${API_URL}/lol/match/v5/matches/by-puuid/${summonerId}/ids?start=0&count=20&api_key=${API_KEY}`);
-        console.log('made it past');
-        const matchHistory = await matchHistoryResponse.json();
-        console.log(matchHistory);
-        // Display the match history data in a table
-        const table = document.getElementById('matchHistoryTable');
-        for (const match of matchHistory.matches) {
-          const row = document.createElement('tr');
-          const gameIdCell = document.createElement('td');
-          gameIdCell.innerText = match.gameId;
-          const championCell = document.createElement('td');
-          championCell.innerText = match.champion;
-          const queueCell = document.createElement('td');
-          queueCell.innerText = match.queue;
-          const timestampCell = document.createElement('td');
-          timestampCell.innerText = match.timestamp;
-          row.appendChild(gameIdCell);
-          row.appendChild(championCell);
-          row.appendChild(queueCell);
-          row.appendChild(timestampCell);
-          table.appendChild(row);
-        }
+      var API_KEY = "RGAPI-a204f002-9917-4f65-9005-ea585c6bbed2"
+      function lookupSummoner() {
+        // Get the summoner name from the text field
+        var summonerName = document.getElementById("summonerName").value;
+        
+        // Make a request to the Riot Games API to get the summoner data
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + API_KEY, true);
+        xhr.onload = function() {
+          if (this.status == 200) {
+            // If the request is successful, display the result
+            document.getElementById("result").textContent = this.responseText;
+          }
+        };
+        xhr.send();
       }
     </script>
   </body>
