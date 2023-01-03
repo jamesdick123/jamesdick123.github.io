@@ -1,19 +1,33 @@
 <html>
   <head>
-    <title>Summoner Lookup</title>
+    <title>Summoner Match History</title>
   </head>
   <body>
-    <h1>Summoner Lookup</h1>
+    <h1>Summoner Match History</h1>
     <p>Enter a summoner name:</p>
     <input type="text" id="summonerName">
     <button onclick="lookupSummoner()">Lookup</button>
     <br><br>
     <p>Result:</p>
-    <pre id="result"></pre>
+    <div id="result"></div>
+    
+    <style>
+      /* Style the grid */
+      .match-history-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-gap: 10px;
+      }
+      .match-history-cell {
+        background-color: #ddd;
+        border: 1px solid #aaa;
+        padding: 10px;
+      }
+    </style>
     
     <script>
-      var API_KEY = "RGAPI-a204f002-9917-4f65-9005-ea585c6bbed2"
       function lookupSummoner() {
+        var API_KEY = "RGAPI-a204f002-9917-4f65-9005-ea585c6bbed2"
         // Get the summoner name from the text field
         var summonerName = document.getElementById("summonerName").value;
         
@@ -22,12 +36,30 @@
         xhr.open("GET", "https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + API_KEY, true);
         xhr.onload = function() {
           if (this.status == 200) {
-            // If the request is successful, display the result
-            document.getElementById("result").textContent = this.responseText;
+            // If the request is successful, get the puuid from the JSON and use it to make a request to the second API
+            var summonerData = JSON.parse(this.responseText);
+            var puuid = summonerData.puuid;
+            var xhr2 = new XMLHttpRequest();
+            xhr2.open("GET", "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "ids?start=0&count=20&api_key=" + API_KEY, true);
+            xhr2.onload = function() {
+              if (this.status == 200) {
+                // If the request is successful, display the first 10 results in a grid on the page
+                var matchData = JSON.parse(this.responseText);
+                var matchHistoryGrid = document.createElement("div");
+                matchHistoryGrid.classList.add("match-history-grid");
+                for (var i = 0; i < 10; i++) {
+                  var match = matchData[i];
+                  var matchHistoryCell = document.createElement("div");
+                  matchHistoryCell.classList.add("match-history-cell");
+                  matchHistoryCell.textContent = match.gameId;
+                  matchHistoryGrid.appendChild(matchHistoryCell);
+                }
+                document.getElementById("result").innerHTML = "";
+                document.getElementById("result").appendChild(matchHistoryGrid);
+              }
+            };
+            xhr2.send();
           }
         };
         xhr.send();
-      }
-    </script>
-  </body>
-</html>
+     
