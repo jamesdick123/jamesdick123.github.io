@@ -34,7 +34,7 @@
         
         // Make a request to the Riot Games API to get the summoner data
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + API_KEY, true);
+        xhr.open("GET", "https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName + "&api_key=" + API_KEY, true);
         xhr.onload = function() {
           if (this.status == 200) {
             // If the request is successful, get the puuid from the JSON and use it to make a request to the second API
